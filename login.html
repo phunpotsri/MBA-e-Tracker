@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - MBA-BI Connect</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        button:hover {
+            background-color: #1557b0;
+        }
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .alert-error {
+            background-color: #fde8e8;
+            color: #c81e1e;
+            border: 1px solid #fecaca;
+        }
+        .alert-success {
+            background-color: #e8fde8;
+            color: #1ec81e;
+            border: 1px solid #cafeca;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2 style="text-align: center; margin-bottom: 2rem;">เข้าสู่ระบบ MBA-BI Connect</h2>
+        
+        <div class="alert alert-error" id="error-message">
+            ไม่พบข้อมูลผู้ใช้งานในระบบ
+        </div>
+        
+        <div class="alert alert-success" id="success-message">
+            เข้าสู่ระบบสำเร็จ
+        </div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label for="student-id">รหัสนักศึกษา</label>
+                <input type="text" id="student-id" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="citizen-id">เลขบัตรประชาชน</label>
+                <input type="text" id="citizen-id" required>
+            </div>
+            
+            <button type="submit">เข้าสู่ระบบ</button>
+        </form>
+    </div>
+
+    <script>
+        // ฝังข้อมูลผู้ใช้ไว้ในไฟล์เลย
+        const studentData = {
+            "students": [
+                {
+                    "thai_name": "พันธ์พจน์ ศรีประดู่",
+                    "name": "Phunpot sri",
+                    "student_id": "7564871",
+                    "citizen_id": "1103703211137",
+                    "date_of_birth": {
+                        "thai_format": "22/3/2544",
+                        "iso_format": "2001-03-22",
+                        "display_format": "22/3/2001"
+                    }
+                }
+            ]
+        };
+
+        $(document).ready(function() {
+            $('#login-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                const studentId = $('#student-id').val();
+                const citizenId = $('#citizen-id').val();
+
+                // ตรวจสอบข้อมูลการเข้าสู่ระบบ
+                const user = studentData.students.find(student => 
+                    student.student_id === studentId && 
+                    student.citizen_id === citizenId
+                );
+
+                if (user) {
+                    // เก็บข้อมูลผู้ใช้ใน sessionStorage
+                    sessionStorage.setItem('currentUser', JSON.stringify(user));
+                    
+                    $('#success-message').show();
+                    $('#error-message').hide();
+                    
+                    // รอ 1 วินาทีแล้วไปยังหน้า profile
+                    setTimeout(() => {
+                        window.location.href = 'profile.html';
+                    }, 1000);
+                } else {
+                    $('#error-message').show();
+                    $('#success-message').hide();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรไฟล์ - MBA-BI Connect</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .profile-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .profile-info {
+            margin-bottom: 1.5rem;
+        }
+        .info-item {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .info-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        .info-value {
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .logout-btn {
+            padding: 0.75rem 2rem;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <h2>ข้อมูลผู้ใช้งาน</h2>
+            <button class="logout-btn" id="logout-btn">ออกจากระบบ</button>
+        </div>
+
+        <div class="profile-info">
+            <div class="info-item">
+                <div class="info-label">ชื่อ-นามสกุล (ภาษาไทย)</div>
+                <div class="info-value" id="thai-name"></div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">ชื่อ-นามสกุล (ภาษาอังกฤษ)</div>
+                <div class="info-value" id="eng-name"></div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">รหัสนักศึกษา</div>
+                <div class="info-value" id="student-id"></div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">เลขบัตรประชาชน</div>
+                <div class="info-value" id="citizen-id"></div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">วันเดือนปีเกิด</div>
+                <div class="info-value" id="birth-date"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // ตรวจสอบการล็อกอิน
+            const userData = sessionStorage.getItem('currentUser');
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = JSON.parse(userData);
+
+            // แสดงข้อมูลผู้ใช้
+            $('#thai-name').text(user.thai_name);
+            $('#eng-name').text(user.name);
+            $('#student-id').text(user.student_id);
+            $('#citizen-id').text(user.citizen_id);
+            $('#birth-date').text(user.date_of_birth.display_format);
+
+            // จัดการการออกจากระบบ
+            $('#logout-btn').click(function() {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+</body>
+</html>
