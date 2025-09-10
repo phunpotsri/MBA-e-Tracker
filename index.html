@@ -1,13 +1,230 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <base target="_top">
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เว็บแอป</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MBA Panyapiwat e-Tracker</title>
+
+  <!-- เปลี่ยน favicon เป็นโลโก้ของสถาบัน ถ้ามีให้แก้ URL -->
+  <link rel="icon" href="https://ba.pim.ac.th/wp-content/uploads/2024/01/pim-favicon.png" type="image/x-icon">
+
+  <style>
+    :root{
+      --pim-blue: #0b6fb8;
+      --pim-dark: #113047;
+      --muted: #6b7280;
+      --bg: #f7fafc;
+      --card: #ffffff;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: "Prompt", Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--pim-dark);
+    }
+
+    /* layout */
+    .page {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 18px;
+      background: linear-gradient(90deg, rgba(11,111,184,0.06), rgba(17,48,71,0.03));
+      border-bottom: 1px solid rgba(17,48,71,0.06);
+      min-height: 56px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(17,48,71,0.06);
+      background: white;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .brand p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .spacer { flex: 1; }
+
+    .header-actions {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .iframe-container {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 56px);
+      background: var(--card);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* loader overlay */
+    .loader-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(247,250,252,0.6));
+      transition: opacity 240ms ease, visibility 240ms ease;
+    }
+
+    .loader-box {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: rgba(255,255,255,0.9);
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(17,48,71,0.08);
+      font-size: 0.98rem;
+      color: var(--pim-dark);
+      border: 1px solid rgba(17,48,71,0.04);
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid rgba(11,111,184,0.15);
+      border-top-color: var(--pim-blue);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* small footer note inside header for version/status */
+    .status {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+
+    /* responsive tweaks */
+    @media (max-width:600px){
+      .brand h1 { font-size: 0.95rem; }
+      .brand p { display: none; }
+    }
+  </style>
 </head>
 <body>
-    <iframe style="width: 100%; height: 100vh;" scrolling="yes" src="https://script.google.com/macros/s/AKfycbzmR-edHNteG82-CgB5rInJFN_JzNvxw3yVuhGvX1eqIjKVNLhn5PeaKdp9BZ8YU5du/exec" frameborder="0"></iframe>
+  <div class="page">
+    <header>
+      <div class="brand">
+        <!-- เปลี่ยน src เป็นโลโก้จริงของโปรแกรม/สถาบัน -->
+        <img src="https://ba.pim.ac.th/wp-content/uploads/2024/01/pim-logo-square.png" alt="PIM Logo" />
+        <div>
+          <h1>MBA Panyapiwat · e-Tracker</h1>
+          <p>ระบบติดตามผลงานและสถานะโครงการ — หลักสูตร MBA (สาขา Business Innovation)</p>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="header-actions">
+        สถานะ: <span class="status" id="appStatus">Loading...</span>
+      </div>
+    </header>
+
+    <main class="iframe-container">
+      <div class="loader-overlay" id="loader">
+        <div class="loader-box">
+          <div class="spinner" aria-hidden="true"></div>
+          <div>
+            <div style="font-weight:700;">กำลังโหลด e-Tracker ของ MBA PIM…</div>
+            <div style="font-size:0.85rem;color:var(--muted);margin-top:4px;">กรุณารอสักครู่ — เชื่อมต่อข้อมูลจากระบบกลาง</div>
+          </div>
+        </div>
+      </div>
+
+      <!--
+        เปลี่ยน src ของ iframe เป็น URL ของ e-Tracker จริงของคุณ
+        ตัวอย่าง: https://ba.pim.ac.th/e-tracker หรือ URL ของ Google Apps Script ที่ใช้งานจริง
+      -->
+      <iframe
+        id="trackerFrame"
+        src="https://ba.pim.ac.th/e-tracker"
+        title="MBA Panyapiwat e-Tracker"
+        allow="fullscreen;">
+      </iframe>
+    </main>
+  </div>
+
+  <script>
+    // เมื่อ iframe โหลดเสร็จ ให้ซ่อน loader และอัพเดตสถานะ
+    const iframe = document.getElementById('trackerFrame');
+    const loader = document.getElementById('loader');
+    const status = document.getElementById('appStatus');
+
+    // หาก iframe ส่ง postMessage มาให้เรารับสถานะได้ (opt-in)
+    window.addEventListener('message', (ev) => {
+      // ปลอดภัย: ตรวจสอบ origin ถ้าต้องการ (ตัวอย่างเช่น 'https://ba.pim.ac.th')
+      // if (ev.origin !== 'https://ba.pim.ac.th') return;
+      try {
+        const data = typeof ev.data === 'string' ? JSON.parse(ev.data) : ev.data;
+        if (data && data.appStatus) {
+          status.textContent = data.appStatus;
+        }
+      } catch(e){
+        // ข้ามข้อความไม่ใช่ JSON
+      }
+    });
+
+    // ซ่อน loader เมื่อ iframe โหลดเสร็จ (onload)
+    iframe.addEventListener('load', () => {
+      // ซ่อนแบบนุ่มนวล
+      loader.style.opacity = '0';
+      loader.style.visibility = 'hidden';
+      status.textContent = 'พร้อมใช้งาน';
+      // ถ้าต้องการ ping ให้ iframe ตอบกลับเพื่อเช็คสถานะ:
+      try { iframe.contentWindow.postMessage({action:'ping'}, '*'); } catch(e){}
+    });
+
+    // fallback: ถ้าโหลดไม่เสร็จภายใน 12 วินาที ให้แสดงสถานะ error
+    setTimeout(() => {
+      if (loader && getComputedStyle(loader).visibility !== 'hidden') {
+        status.textContent = 'การเชื่อมต่อช้า — โปรดรีเฟรช';
+      }
+    }, 12000);
+  </script>
 </body>
 </html>
